@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat via API</title>
+</head>
+<body>
+    <div id="chat-box" style="width: 300px; height: 300px; border: 1px solid #ccc; overflow-y: scroll;"></div>
+    <input type="text" id="name-input" placeholder="Seu nome" style="width: 150px;">
+    <input type="text" id="message-input" placeholder="Sua mensagem" style="width: 150px;">
+    <button onclick="sendMessage()">Enviar</button>
+
+    <script>
+        function sendMessage() {
+            var nameInput = document.getElementById("name-input").value;
+            var messageInput = document.getElementById("message-input").value;
+            var chatBox = document.getElementById("chat-box");
+            var messageElement = document.createElement("div");
+            messageElement.textContent = nameInput + ": " + messageInput;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+
+            // Enviar a mensagem para a API
+            fetch("https://app-uniara-eb91fc9ec7bf.herokuapp.com/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ nome: nameInput, msg: messageInput })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ocorreu um erro ao enviar a mensagem.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                // Lidar com erros, se necessário
+            });
+            document.getElementById("message-input").value = ""; // Limpar campo de mensagem
+        }
+
+        // Função para carregar as mensagens do chat ao carregar a página
+        window.onload = function() {
+            fetch("https://app-uniara-eb91fc9ec7bf.herokuapp.com/chat")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ocorreu um erro ao carregar as mensagens do chat.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                var chatBox = document.getElementById("chat-box");
+                data.forEach(message => {
+                    var messageElement = document.createElement("div");
+                    messageElement.textContent = message.nome + ": " + message.msg;
+                    chatBox.appendChild(messageElement);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+            })
+            .catch(error => {
+                console.error("Erro:", error);
+                // Lidar com erros, se necessário
+            });
+        };
+    </script>
+</body>
+</html>

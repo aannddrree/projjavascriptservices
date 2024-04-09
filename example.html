@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo de Chamada de API com JavaScript</title>
+</head>
+<body>
+    <table id="dataTable" border="1">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Descrição</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>   
+</body>
+<script>
+    // URL da API que queremos chamar
+    const apiUrl = 'https://app-uniara-eb91fc9ec7bf.herokuapp.com/list';
+
+    // Função para chamar a API
+    async function chamarAPI() {
+        try {
+            // Fazendo uma requisição GET para a API usando fetch()
+            const response = await fetch(apiUrl);
+
+            // Verifica se a resposta foi bem-sucedida (status 200)
+            if (!response.ok) {
+                throw new Error('Erro ao chamar API: ' + response.statusText);
+            }
+
+            // Converte a resposta para JSON
+            const data = await response.json();
+
+            // Limpa a tabela
+            document.getElementById('tableBody').innerHTML = '';
+
+            // Preenche a tabela com os dados retornados pela API
+            data.forEach(item => {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.description}</td>
+                `;
+                document.getElementById('tableBody').appendChild(newRow);
+            });
+        } catch (error) {
+            console.error('Erro:', error);
+            document.getElementById('output').innerHTML = 'Erro ao chamar API.';
+        }
+    }
+
+    // Chama a função para chamar a API quando a página carregar
+    window.onload = chamarAPI;
+</script>
+</html>
